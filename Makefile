@@ -17,6 +17,9 @@ default:
 play: output.raw
 	aplay -c1 -r 48000 -f s32 output.raw
 
+visualize: input.raw output.raw magnitude.raw outmagnitude.raw
+	python3 visualize.py input.raw output.raw magnitude.raw outmagnitude.raw
+
 %.raw: %.mp3
 	ffmpeg -y -v fatal -i $< -f s32le -ar 48000 -ac 1 $@
 
@@ -32,6 +35,12 @@ convert: convert.o
 output.raw: input.raw convert
 	./convert echo $(echo_defaults) < input.raw > output.raw
 
+magnitude.raw: input.raw convert
+	./convert magnitude 0.1 0.0001 0 0 < input.raw > magnitude.raw
+
+outmagnitude.raw: output.raw convert
+	./convert magnitude 0.1 0.0001 0 0 < output.raw > outmagnitude.raw
+
 input.raw: BassForLinus.mp3
 	ffmpeg -y -v fatal -i $< -f s32le -ar 48000 -ac 1 $@
 
@@ -43,4 +52,4 @@ gensin.h: gensin
 
 gensin: gensin.c
 
-.PHONY: default play output.raw $(effects) SeymourDuncan
+.PHONY: default play output.raw $(effects) SeymourDuncan visualize

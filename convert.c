@@ -23,6 +23,24 @@ typedef unsigned int uint;
 #include "phaser.h"
 #include "discont.h"
 
+struct {
+	float attack, decay, value;
+} magnitude;
+static inline void magnitude_init(float pot1, float pot2, float pot3, float pot4)
+{
+	magnitude.attack = pot1;
+	magnitude.decay = pot2;
+}
+static inline float magnitude_step(float in)
+{
+	float mult, val = magnitude.value;
+
+	in = fabs(in);
+	mult = (in > val) ? magnitude.attack : magnitude.decay;
+	val += mult * (in - val);
+	return magnitude.value = val;
+}
+
 #define EFF(x) { #x, x##_init, x##_step }
 struct effect {
 	const char *name;
@@ -30,6 +48,7 @@ struct effect {
 	float (*step)(float);
 } effects[] = {
 	EFF(discont), EFF(phaser), EFF(flanger), EFF(echo), EFF(fm),
+	EFF(magnitude),
 };
 
 #define UPDATE(x) x += 0.001 * (target_##x - x)
