@@ -33,11 +33,11 @@ float phaser_step(float in)
 	float freq = fastpow(2, lfo*phaser.octaves) * phaser.center_f;
 	float out;
 
-	biquad_allpass_filter(&phaser.coeff, freq, phaser.Q);
+	_biquad_allpass_filter(&phaser.coeff, freq, phaser.Q);
 
-	out = biquad_step(&phaser.coeff, &phaser.ph1, in + phaser.prev * phaser.feedback);
-	out = biquad_step(&phaser.coeff, &phaser.ph2, out);
-	out = biquad_step(&phaser.coeff, &phaser.ph3, out);
+	out = _biquad_step(&phaser.coeff, &phaser.ph1, in + phaser.prev * phaser.feedback);
+	out = _biquad_step(&phaser.coeff, &phaser.ph2, out);
+	out = _biquad_step(&phaser.coeff, &phaser.ph3, out);
 	phaser.prev = out;
 
 	return limit_value(in + out);

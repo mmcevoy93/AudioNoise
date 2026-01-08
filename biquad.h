@@ -15,7 +15,7 @@ struct biquad {
 	struct biquad_state state;
 };
 
-static inline float biquad_step(struct biquad_coeff *c, struct biquad_state *s, float x0)
+static inline float _biquad_step(struct biquad_coeff *c, struct biquad_state *s, float x0)
 {
 	float w0, w1 = s->w1, w2 = s->w2;
 	float y0;
@@ -26,7 +26,7 @@ static inline float biquad_step(struct biquad_coeff *c, struct biquad_state *s, 
 	return y0;
 }
 
-static inline void biquad_lpf(struct biquad_coeff *res, float f, float Q)
+static inline void _biquad_lpf(struct biquad_coeff *res, float f, float Q)
 {
 	struct sincos w0 = fastsincos(f/SAMPLES_PER_SEC);
 	float alpha = w0.sin/(2*Q);
@@ -40,7 +40,7 @@ static inline void biquad_lpf(struct biquad_coeff *res, float f, float Q)
 	res->a2 = (1 - alpha)	* a0_inv;
 }
 
-static inline void biquad_hpf(struct biquad_coeff *res, float f, float Q)
+static inline void _biquad_hpf(struct biquad_coeff *res, float f, float Q)
 {
 	struct sincos w0 = fastsincos(f/SAMPLES_PER_SEC);
 	float alpha = w0.sin/(2*Q);
@@ -54,7 +54,7 @@ static inline void biquad_hpf(struct biquad_coeff *res, float f, float Q)
 	res->a2 = (1 - alpha)	* a0_inv;
 }
 
-static inline void biquad_notch_filter(struct biquad_coeff *res, float f, float Q)
+static inline void _biquad_notch_filter(struct biquad_coeff *res, float f, float Q)
 {
 	struct sincos w0 = fastsincos(f/SAMPLES_PER_SEC);
 	float alpha = w0.sin/(2*Q);
@@ -67,7 +67,7 @@ static inline void biquad_notch_filter(struct biquad_coeff *res, float f, float 
 	res->a2 = (1 - alpha)	* a0_inv;
 }
 
-static inline void biquad_bpf_peak(struct biquad_coeff *res, float f, float Q)
+static inline void _biquad_bpf_peak(struct biquad_coeff *res, float f, float Q)
 {
 	struct sincos w0 = fastsincos(f/SAMPLES_PER_SEC);
 	float alpha = w0.sin/(2*Q);
@@ -80,7 +80,7 @@ static inline void biquad_bpf_peak(struct biquad_coeff *res, float f, float Q)
 	res->a2 = (1 - alpha)	* a0_inv;
 }
 
-static inline void biquad_bpf(struct biquad_coeff *res, float f, float Q)
+static inline void _biquad_bpf(struct biquad_coeff *res, float f, float Q)
 {
 	struct sincos w0 = fastsincos(f/SAMPLES_PER_SEC);
 	float alpha = w0.sin/(2*Q);
@@ -93,7 +93,7 @@ static inline void biquad_bpf(struct biquad_coeff *res, float f, float Q)
 	res->a2 = (1 - alpha)	* a0_inv;
 }
 
-static inline void biquad_allpass_filter(struct biquad_coeff *res, float f, float Q)
+static inline void _biquad_allpass_filter(struct biquad_coeff *res, float f, float Q)
 {
 	struct sincos w0 = fastsincos(f/SAMPLES_PER_SEC);
 	float alpha = w0.sin/(2*Q);
@@ -105,3 +105,13 @@ static inline void biquad_allpass_filter(struct biquad_coeff *res, float f, floa
 	res->a1 = res->b1;
 	res->a2 = res->b0;
 }
+
+static inline float biquad_step(struct biquad *bq, float x0)
+{ return _biquad_step(&bq->coeff, &bq->state, x0); }
+
+#define biquad_lpf(bq,f,Q) _biquad_lpf(&(bq)->coeff,f,Q)
+#define biquad_hpf(bq,f,Q) _biquad_hpf(&(bq)->coeff,f,Q)
+#define biquad_notch_filter(bq,f,Q) _biquad_notch_filter(&(bq)->coeff,f,Q)
+#define biquad_bpf_peak(bq,f,Q) _biquad_bpf_peak(&(bq)->coeff,f,Q)
+#define biquad_bpf(bq,f,Q) _biquad_bpf(&(bq)->coeff,f,Q)
+#define biquad_allpass_filter(bq,f,Q) _biquad_allpass_filter(&(bq)->coeff,f,Q)
