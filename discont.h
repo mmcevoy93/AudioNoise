@@ -27,7 +27,7 @@ void discont_init(float pot1, float pot2, float pot3, float pot4)
 	// Walking backwards lowers the pitch
 	// Walking forwards raises the pitch
 	// Staying at the same delay keeps the pitch the same
-	float step = fastpow2_m1(pot1);
+	float step = fastpow2_m1(pot1*2 - 1);
 	disco.step = step;
 
 	// We set the LFO to be 2*DISCONT_STEPS
